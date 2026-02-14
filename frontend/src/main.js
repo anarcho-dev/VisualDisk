@@ -1,7 +1,51 @@
 import "./styles.css";
 import { initVisualization, updateRings } from "./visualization";
 
-const apiBase = import.meta.env.VITE_API_BASE || "http://localhost:5000";
+const configuredApiBase = import.meta.env.VITE_API_BASE;
+
+function getCandidateBases() {
+  if (configuredApiBase) {
+    return [configuredApiBase];
+  }
+
+  const host = window.location.hostname || "localhost";
+  const candidates = [`http://${host}:5000`];
+
+  for (let port = 5001; port <= 5010; port += 1) {
+    candidates.push(`http://${host}:${port}`);
+  }
+
+  return candidates;
+}
+
+async function backendReachable(baseUrl) {
+  try {
+    const response = await fetch(`${baseUrl}/api/health`);
+    return response.ok;
+  } catch {
+    return false;
+  }
+}
+
+async function resolveApiBase() {
+  const candidates = getCandidateBases();
+  const primaryBase = candidates[0];
+
+  if (await backendReachable(primaryBase)) {
+    return primaryBase;
+  }
+
+  for (let i = 1; i < candidates.length; i += 1) {
+    const candidate = candidates[i];
+    if (await backendReachable(candidate)) {
+      return candidate;
+    }
+  }
+
+  return primaryBase;
+}
+
+let apiBase;
 
 const elements = {
   refreshBtn: document.getElementById("refreshBtn"),
@@ -25,7 +69,20 @@ const state = {
 };
 
 const vizContainer = document.getElementById("viz");
-initVisualization(vizContainer);
+
+async function main() {
+  apiBase = await resolveApiBase();
+  vizContainer.innerHTML = "";
+  initVisualization(vizContainer);
+  elements.refreshBtn.addEventListener("click", loadAll);
+  elements.snapshotBtn.addEventListener("click", saveSnapshot);
+  elements.autoBtn.addEventListener("click", toggleAutoRefresh);
+  await loadAll();
+}
+
+main().catch((error) => {
+  setStatus(error?.message || "Backend nicht erreichbar");
+});
 
 function formatBytes(value) {
   if (!Number.isFinite(value)) {
@@ -167,9 +224,3 @@ function toggleAutoRefresh() {
     state.timer = null;
   }
 }
-
-elements.refreshBtn.addEventListener("click", loadAll);
-elements.snapshotBtn.addEventListener("click", saveSnapshot);
-elements.autoBtn.addEventListener("click", toggleAutoRefresh);
-
-loadAll();

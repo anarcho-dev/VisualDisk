@@ -169,6 +169,15 @@ def persist_snapshot(metrics: Dict[str, object]) -> int:
 		session.close()
 
 
+def find_free_port(start_port=5000):
+    """Find an available port starting from start_port."""
+    port = start_port
+    while True:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            if s.connect_ex(("localhost", port)) != 0:
+                return port
+            port += 1
+
 def create_app() -> Flask:
 	app = Flask(__name__)
 	CORS(app, resources={r"/api/*": {"origins": "*"}})
@@ -239,9 +248,15 @@ def create_app() -> Flask:
 		finally:
 			session.close()
 
+	@app.route("/api/port")
+	def get_port():
+		return jsonify({"port": app.config.get("SERVER_PORT", 5000)})
+
 	return app
 
 
 if __name__ == "__main__":
+	port = find_free_port()
 	app = create_app()
-	app.run(host="0.0.0.0", port=5000, debug=True)
+	app.config["SERVER_PORT"] = port
+	app.run(host="0.0.0.0", port=port, debug=True)

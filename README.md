@@ -11,15 +11,19 @@ Live System Storage Intelligence: VisualDisk liefert eine hochaufgeloeste 3D-Vis
 
 ## Inhalt
 
-- [Highlights](#highlights)
-- [Screenshots](#screenshots)
-- [Konzept](#konzept)
-- [Architektur](#architektur)
-- [API](#api)
-- [Datenbank](#datenbank)
-- [Techstack](#techstack)
-- [Setup](#setup)
-- [Konfiguration](#konfiguration)
+- [VisualDisk](#visualdisk)
+  - [Inhalt](#inhalt)
+  - [Highlights](#highlights)
+  - [Screenshots](#screenshots)
+  - [Konzept](#konzept)
+  - [Architektur](#architektur)
+  - [API](#api)
+  - [Datenbank](#datenbank)
+  - [Techstack](#techstack)
+  - [Setup](#setup)
+    - [Backend](#backend)
+    - [Frontend](#frontend)
+  - [Konfiguration](#konfiguration)
 
 ## Highlights
 
@@ -31,6 +35,8 @@ Live System Storage Intelligence: VisualDisk liefert eine hochaufgeloeste 3D-Vis
 ## Screenshots
 
 ![Screenshot](screenshots/screenshot.png)
+
+![Screenshot 2](screenshots/screenshot_2.png)
 
 ## Konzept
 
